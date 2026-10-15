@@ -43,7 +43,7 @@ export function topReasons(tags: Tags, profile: Profile, n = 2): Tag[] {
 }
 
 export const describeReasons = (reasons: Tag[]) =>
-  reasons.length ? `Fits your ${reasons.map((r) => TAG_LABELS[r]).join(' and ')}.` : 'A flexible choice for your concept.';
+  reasons.length ? `Fits your story of ${reasons.map((r) => TAG_LABELS[r]).join(' and ')}.` : 'A flexible choice for your concept.';
 
 /** The strongest traits in a profile, for display. */
 export function dominantTags(profile: Profile, n = 5): Tag[] {

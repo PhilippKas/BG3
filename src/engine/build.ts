@@ -31,6 +31,7 @@ import {
   addIncreases,
   allocate,
   applyBonuses,
+  isLegalPointBuy,
   isValidPointBuy,
   modifier,
   planAbilityImprovement,
@@ -257,7 +258,7 @@ export function deriveBuild(choices: Choices): Build {
   const background = (choices.backgroundId && backgroundById(choices.backgroundId)) || backgrounds[0]!.item;
 
   // Abilities
-  const base = choices.base && isValidPointBuy(choices.base) ? choices.base : allocate(priority);
+  const base = choices.base && isLegalPointBuy(choices.base) ? choices.base : allocate(priority);
   const plus2 = choices.plus2 ?? priority[0]!;
   const plus1 = choices.plus1 && choices.plus1 !== plus2 ? choices.plus1 : priority.find((a) => a !== plus2)!;
   const start = applyBonuses(base, plus2, plus1);

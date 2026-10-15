@@ -31,6 +31,13 @@ export function isValidPointBuy(base: Scores): boolean {
   );
 }
 
+/** Within range and not overspent (unspent points are allowed while editing). */
+export function isLegalPointBuy(base: Scores): boolean {
+  return (
+    ABILITIES.every((a) => base[a] >= POINT_BUY_MIN && base[a] <= POINT_BUY_MAX) && pointsSpent(base) <= POINT_BUY_TOTAL
+  );
+}
+
 export function allocate(priority: readonly Ability[]): Scores {
   const base = {} as Scores;
   priority.forEach((a, i) => (base[a] = STANDARD_SPREAD[i] ?? POINT_BUY_MIN));

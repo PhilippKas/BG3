@@ -1,5 +1,5 @@
 import { ARMOURS, ITEMS, SHIELD_AC, weaponById } from '../data';
-import type { Ability, ArmourCategory, BaseWeapon, ClassDef, Item, Slot, Subclass } from '../data/schema';
+import { ABILITIES, type Ability, type ArmourCategory, type BaseWeapon, type ClassDef, type Item, type Slot, type Subclass } from '../data/schema';
 import { modifier, type Scores } from './abilities';
 import { affinity, type Profile } from './tags';
 import type { WeaponStyle } from './recommend';
@@ -94,7 +94,7 @@ export function planWeapons(weaponStyle: WeaponStyle, profs: string[], feats: st
       return { melee: 'Unarmed strikes (keep hands free)', offhand: '—', ranged: name(['shortbow', 'light-crossbow', 'dagger']) };
     case 'caster':
     default:
-      return { melee: name(['quarterstaff', 'mace', 'dagger', 'club']), offhand: '— (or a shield if proficient)', ranged: name(['light-crossbow', 'shortbow', 'hand-crossbow']) };
+      return { melee: name(['quarterstaff', 'mace', 'dagger', 'club']), offhand: '— (keep a hand free for casting)', ranged: name(['light-crossbow', 'shortbow', 'hand-crossbow']) };
   }
 }
 
@@ -114,8 +114,8 @@ const SLOT_LABELS: Record<Slot, string> = {
 export interface GearSlotPlan {
   slot: Slot;
   label: string;
-  /** Spoiler-free baseline (base item type). */
-  baseline: string;
+  /** Spoiler-free baseline (base item type), for armour and weapon slots. */
+  baseline?: string;
   /** What to look for in this slot. */
   lookFor: string;
   items: { item: Item; score: number }[];
@@ -131,6 +131,8 @@ export interface GearContext {
   weapons: WeaponPlan;
   primary: Ability;
 }
+
+const ABILITY_TOKENS = new Set<string>(ABILITIES);
 
 function itemFits(item: Item, ctx: GearContext): boolean {
   if (item.armourCategory && item.slot === 'armour' && !ctx.armour.includes(item.armourCategory)) return false;
@@ -153,7 +155,9 @@ function itemFits(item: Item, ctx: GearContext): boolean {
       if (!ok[ctx.weaponStyle]) return false;
     }
   }
-  // Items tied to abilities need at least one ability or style match.
+  // Items tied to specific abilities must match one of the build's main abilities.
+  const abilities = item.synergy.filter((s) => ABILITY_TOKENS.has(s));
+  if (abilities.length && !abilities.some((a) => ctx.synergy.has(a))) return false;
   return item.synergy.some((s) => ctx.synergy.has(s));
 }
 
@@ -186,7 +190,7 @@ export function planGear(ctx: GearContext): GearSlotPlan[] {
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
-    return { slot, label: SLOT_LABELS[slot], baseline: baseline[slot] ?? 'Any', lookFor: LOOK_FOR[slot]!(ctx), items };
+    return { slot, label: SLOT_LABELS[slot], baseline: baseline[slot], lookFor: LOOK_FOR[slot]!(ctx), items };
   });
 }
 
