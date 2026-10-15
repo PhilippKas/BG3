@@ -1,0 +1,332 @@
+import type { Race } from './schema';
+
+const darkvision = { name: 'Darkvision', summary: 'See in the dark up to 12 m.' };
+const superiorDarkvision = { name: 'Superior Darkvision', summary: 'See in the dark up to 24 m.' };
+const feyAncestry = { name: 'Fey Ancestry', summary: 'Advantage on saving throws against being Charmed, and magic can’t put you to sleep.' };
+const keenSenses = { name: 'Keen Senses', summary: 'Proficiency in Perception.' };
+const civilMilitia = { name: 'Civil Militia', summary: 'Proficiency with spears, pikes, halberds, glaives, light armour and shields.' };
+const fleetOfFoot = { name: 'Fleet of Foot', summary: 'Movement speed increased by 1.5 m.' };
+const maskOfTheWild = { name: 'Mask of the Wild', summary: 'Proficiency in Stealth.' };
+const drowMagic = { name: 'Drow Magic', summary: 'Dancing Lights cantrip; Faerie Fire at level 3; Darkness at level 5 (once per long rest).' };
+
+const militiaWeapons = ['spear', 'pike', 'halberd', 'glaive'];
+
+export const RACES: Race[] = [
+  {
+    id: 'human',
+    name: 'Human',
+    summary: 'Adaptable and ambitious, humans thrive in every walk of life.',
+    speed: 9,
+    darkvision: 0,
+    features: [civilMilitia, { name: 'Human Versatility', summary: 'Proficiency in one extra skill of your choice and +25% carrying capacity.' }],
+    armour: ['light', 'shield'],
+    weapons: militiaWeapons,
+    skills: [],
+    bonusSkills: 1,
+    subraces: [],
+    tags: { order: 1, protector: 1, martial: 1, noble: 1 },
+  },
+  {
+    id: 'elf',
+    name: 'Elf',
+    summary: 'Graceful, long-lived and attuned to magic and the natural world.',
+    speed: 9,
+    darkvision: 12,
+    features: [darkvision, feyAncestry, keenSenses, { name: 'Elven Weapon Training', summary: 'Proficiency with longswords, shortswords, shortbows and longbows.' }],
+    armour: [],
+    weapons: ['longsword', 'shortsword', 'shortbow', 'longbow'],
+    skills: ['Perception'],
+    subraces: [
+      {
+        id: 'high-elf',
+        name: 'High Elf',
+        features: [{ name: 'Cantrip', summary: 'Learn one Wizard cantrip (Intelligence-based).' }],
+        bonusCantripFrom: 'wizard',
+        tags: { arcane: 2, scholar: 1, noble: 1 },
+      },
+      {
+        id: 'wood-elf',
+        name: 'Wood Elf',
+        features: [fleetOfFoot, maskOfTheWild],
+        speed: 10.5,
+        skills: ['Stealth'],
+        tags: { nature: 2, ranged: 1, beast: 1 },
+      },
+    ],
+    tags: { finesse: 1, arcane: 1, nature: 1, ranged: 1 },
+  },
+  {
+    id: 'drow',
+    name: 'Drow',
+    summary: 'Elves of the Underdark, raised in a cruel society of intrigue.',
+    speed: 9,
+    darkvision: 24,
+    features: [superiorDarkvision, feyAncestry, keenSenses, { name: 'Drow Weapon Training', summary: 'Proficiency with rapiers, shortswords and hand crossbows.' }, drowMagic],
+    armour: [],
+    weapons: ['rapier', 'shortsword', 'hand-crossbow'],
+    skills: ['Perception'],
+    innateSpells: [
+      { level: 1, spell: 'dancing-lights' },
+      { level: 3, spell: 'faerie-fire' },
+      { level: 5, spell: 'darkness' },
+    ],
+    subraces: [
+      { id: 'lolth-sworn-drow', name: 'Lolth-Sworn Drow', features: [], tags: { shadow: 1, noble: 1, divine: 1 } },
+      { id: 'seldarine-drow', name: 'Seldarine Drow', features: [], tags: { outcast: 2, light: 1 } },
+    ],
+    tags: { shadow: 2, finesse: 1, outcast: 1, trickster: 1 },
+  },
+  {
+    id: 'half-elf',
+    name: 'Half-Elf',
+    summary: 'Caught between two worlds, half-elves are charismatic wanderers.',
+    speed: 9,
+    darkvision: 12,
+    features: [darkvision, feyAncestry, civilMilitia],
+    armour: ['light', 'shield'],
+    weapons: militiaWeapons,
+    skills: [],
+    subraces: [
+      {
+        id: 'high-half-elf',
+        name: 'High Half-Elf',
+        features: [{ name: 'Cantrip', summary: 'Learn one Wizard cantrip (Intelligence-based).' }],
+        bonusCantripFrom: 'wizard',
+        tags: { arcane: 1, noble: 1 },
+      },
+      { id: 'wood-half-elf', name: 'Wood Half-Elf', features: [fleetOfFoot, maskOfTheWild], speed: 10.5, skills: ['Stealth'], tags: { nature: 2 } },
+      {
+        id: 'drow-half-elf',
+        name: 'Drow Half-Elf',
+        features: [drowMagic],
+        innateSpells: [
+          { level: 1, spell: 'dancing-lights' },
+          { level: 3, spell: 'faerie-fire' },
+          { level: 5, spell: 'darkness' },
+        ],
+        tags: { shadow: 1, outcast: 1 },
+      },
+    ],
+    tags: { charm: 2, outcast: 1, nature: 1 },
+  },
+  {
+    id: 'half-orc',
+    name: 'Half-Orc',
+    summary: 'Fierce and enduring, half-orcs carry orcish strength and resilience.',
+    speed: 9,
+    darkvision: 12,
+    features: [
+      darkvision,
+      { name: 'Menacing', summary: 'Proficiency in Intimidation.' },
+      { name: 'Relentless Endurance', summary: 'Once per long rest, drop to 1 hit point instead of 0.' },
+      { name: 'Savage Attacks', summary: 'Melee critical hits roll an extra weapon damage die.' },
+    ],
+    armour: [],
+    weapons: [],
+    skills: ['Intimidation'],
+    subraces: [],
+    tags: { brute: 3, outcast: 1, vengeance: 1, wild: 1 },
+  },
+  {
+    id: 'halfling',
+    name: 'Halfling',
+    summary: 'Small, cheerful and remarkably lucky.',
+    speed: 7.5,
+    darkvision: 0,
+    features: [
+      { name: 'Lucky', summary: 'Reroll natural 1s on attack rolls, ability checks and saving throws.' },
+      { name: 'Brave', summary: 'Advantage on saving throws against being Frightened.' },
+    ],
+    armour: [],
+    weapons: [],
+    skills: [],
+    subraces: [
+      { id: 'lightfoot-halfling', name: 'Lightfoot Halfling', features: [{ name: 'Naturally Stealthy', summary: 'Advantage on Stealth checks.' }], tags: { shadow: 2, trickster: 1 } },
+      {
+        id: 'strongheart-halfling',
+        name: 'Strongheart Halfling',
+        features: [{ name: 'Strongheart Resilience', summary: 'Advantage on saves against poison and resistance to poison damage.' }],
+        tags: { protector: 1, healer: 1 },
+      },
+    ],
+    tags: { trickster: 2, charm: 1, finesse: 1 },
+  },
+  {
+    id: 'dwarf',
+    name: 'Dwarf',
+    summary: 'Stout, stubborn and as enduring as the mountains they call home.',
+    speed: 7.5,
+    darkvision: 12,
+    features: [
+      darkvision,
+      { name: 'Dwarven Resilience', summary: 'Advantage on saves against poison and resistance to poison damage.' },
+      { name: 'Dwarven Combat Training', summary: 'Proficiency with battleaxes, handaxes, light hammers and warhammers.' },
+    ],
+    armour: [],
+    weapons: ['battleaxe', 'handaxe', 'light-hammer', 'warhammer'],
+    skills: [],
+    subraces: [
+      { id: 'gold-dwarf', name: 'Gold Dwarf', features: [{ name: 'Dwarven Toughness', summary: '+1 hit point per level.' }], hpPerLevel: 1, tags: { divine: 1, scholar: 1, healer: 1 } },
+      {
+        id: 'shield-dwarf',
+        name: 'Shield Dwarf',
+        features: [{ name: 'Dwarven Armour Training', summary: 'Proficiency with light and medium armour.' }],
+        armour: ['light', 'medium'],
+        tags: { martial: 2, protector: 1 },
+      },
+      {
+        id: 'duergar',
+        name: 'Duergar',
+        features: [
+          superiorDarkvision,
+          { name: 'Duergar Resilience', summary: 'Advantage on saves against illusions, Charmed and Paralysed.' },
+          { name: 'Duergar Magic', summary: 'Enlarge at level 3; Invisibility at level 5 (once per long rest).' },
+        ],
+        darkvision: 24,
+        innateSpells: [
+          { level: 3, spell: 'enlarge-reduce' },
+          { level: 5, spell: 'invisibility' },
+        ],
+        tags: { outcast: 1, brute: 1, shadow: 1 },
+      },
+    ],
+    tags: { protector: 2, order: 1, martial: 1 },
+  },
+  {
+    id: 'gnome',
+    name: 'Gnome',
+    summary: 'Curious, clever tinkerers with boundless enthusiasm.',
+    speed: 7.5,
+    darkvision: 12,
+    features: [darkvision, { name: 'Gnome Cunning', summary: 'Advantage on Intelligence, Wisdom and Charisma saving throws.' }],
+    armour: [],
+    weapons: [],
+    skills: [],
+    subraces: [
+      { id: 'rock-gnome', name: 'Rock Gnome', features: [{ name: 'Artificer’s Lore', summary: 'Add double your proficiency bonus to History checks.' }], tags: { scholar: 2 } },
+      {
+        id: 'forest-gnome',
+        name: 'Forest Gnome',
+        features: [{ name: 'Forest Gnome Magic', summary: 'Minor Illusion cantrip and Speak with Animals at will.' }],
+        innateSpells: [
+          { level: 1, spell: 'minor-illusion' },
+          { level: 1, spell: 'speak-with-animals' },
+        ],
+        tags: { nature: 1, trickster: 1, beast: 1 },
+      },
+      {
+        id: 'deep-gnome',
+        name: 'Deep Gnome',
+        features: [superiorDarkvision, { name: 'Svirfneblin Camouflage', summary: 'Advantage on Stealth checks.' }],
+        darkvision: 24,
+        tags: { shadow: 2, outcast: 1 },
+      },
+    ],
+    tags: { scholar: 2, trickster: 1, arcane: 1 },
+  },
+  {
+    id: 'tiefling',
+    name: 'Tiefling',
+    summary: 'Marked by an infernal bloodline, often met with suspicion.',
+    speed: 9,
+    darkvision: 12,
+    features: [darkvision, { name: 'Hellish Resistance', summary: 'Resistance to fire damage.' }],
+    armour: [],
+    weapons: [],
+    skills: [],
+    subraces: [
+      {
+        id: 'asmodeus-tiefling',
+        name: 'Asmodeus Tiefling',
+        features: [{ name: 'Legacy of Asmodeus', summary: 'Thaumaturgy cantrip; Hellish Rebuke at level 3; Darkness at level 5.' }],
+        innateSpells: [
+          { level: 1, spell: 'thaumaturgy' },
+          { level: 3, spell: 'hellish-rebuke' },
+          { level: 5, spell: 'darkness' },
+        ],
+        tags: { pact: 1, noble: 1, vengeance: 1 },
+      },
+      {
+        id: 'mephistopheles-tiefling',
+        name: 'Mephistopheles Tiefling',
+        features: [{ name: 'Legacy of Mephistopheles', summary: 'Mage Hand cantrip; Burning Hands at level 3; Flame Blade at level 5.' }],
+        innateSpells: [
+          { level: 1, spell: 'mage-hand' },
+          { level: 3, spell: 'burning-hands' },
+          { level: 5, spell: 'flame-blade' },
+        ],
+        tags: { arcane: 1, elemental: 2 },
+      },
+      {
+        id: 'zariel-tiefling',
+        name: 'Zariel Tiefling',
+        features: [{ name: 'Legacy of Avernus', summary: 'Thaumaturgy cantrip; Searing Smite at level 3; Branding Smite at level 5.' }],
+        innateSpells: [
+          { level: 1, spell: 'thaumaturgy' },
+          { level: 3, spell: 'searing-smite' },
+          { level: 5, spell: 'branding-smite' },
+        ],
+        tags: { martial: 2, vengeance: 1 },
+      },
+    ],
+    tags: { pact: 1, outcast: 2, elemental: 1, charm: 1 },
+  },
+  {
+    id: 'githyanki',
+    name: 'Githyanki',
+    summary: 'Astral warriors raised for battle, disciplined and proud.',
+    speed: 9,
+    darkvision: 0,
+    features: [
+      { name: 'Martial Prodigy', summary: 'Proficiency with light and medium armour, shortswords, longswords and greatswords.' },
+      { name: 'Astral Knowledge', summary: 'Once per long rest, gain proficiency in all skills of one chosen ability.' },
+      { name: 'Githyanki Psionics', summary: 'Mage Hand cantrip; Enhance Leap at level 3; Misty Step at level 5.' },
+    ],
+    armour: ['light', 'medium'],
+    weapons: ['shortsword', 'longsword', 'greatsword'],
+    skills: [],
+    innateSpells: [
+      { level: 1, spell: 'mage-hand' },
+      { level: 3, spell: 'enhance-leap' },
+      { level: 5, spell: 'misty-step' },
+    ],
+    subraces: [],
+    tags: { martial: 2, order: 1, vengeance: 1, outcast: 1, ascetic: 1 },
+  },
+  {
+    id: 'dragonborn',
+    name: 'Dragonborn',
+    summary: 'Proud draconic humanoids who carry the breath of their ancestors.',
+    speed: 9,
+    darkvision: 0,
+    features: [
+      { name: 'Draconic Ancestry', summary: 'Your ancestry determines your breath weapon and damage resistance.' },
+      { name: 'Breath Weapon', summary: 'Exhale destructive energy (2d6, scales with level) once per short rest.' },
+    ],
+    armour: [],
+    weapons: [],
+    skills: [],
+    subraces: (
+      [
+        ['black', 'Black', 'Acid'],
+        ['blue', 'Blue', 'Lightning'],
+        ['brass', 'Brass', 'Fire'],
+        ['bronze', 'Bronze', 'Lightning'],
+        ['copper', 'Copper', 'Acid'],
+        ['gold', 'Gold', 'Fire'],
+        ['green', 'Green', 'Poison'],
+        ['red', 'Red', 'Fire'],
+        ['silver', 'Silver', 'Cold'],
+        ['white', 'White', 'Cold'],
+      ] as const
+    ).map(([id, name, dmg]) => ({
+      id: `${id}-dragonborn`,
+      name: `${name} Dragonborn`,
+      features: [{ name: `${dmg} Breath`, summary: `${dmg} breath weapon and resistance to ${dmg.toLowerCase()} damage.` }],
+      tags: { elemental: 1 },
+    })),
+    tags: { elemental: 2, noble: 1, brute: 1, innate: 1 },
+  },
+];
+
+export const raceById = (id: string) => RACES.find((r) => r.id === id);
