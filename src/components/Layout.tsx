@@ -3,7 +3,8 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { QUESTIONS } from '../data';
 import { STORY } from '../data/story';
 import { useBuild, useStore, type Theme } from '../store/build';
-import { Moon, Sigil, Sun } from './Icons';
+import { Moon, Save, Sigil, Sun } from './Icons';
+import { useToast } from './Toast';
 
 const NAV = [
   { to: '/origin', label: 'Origin' },
@@ -20,6 +21,9 @@ export function Layout() {
   const build = useBuild();
   const theme = useStore((s) => s.theme);
   const setTheme = useStore((s) => s.setTheme);
+  const save = useStore((s) => s.save);
+  const isSaved = useStore((s) => s.saved.some((b) => JSON.stringify(b.choices) === JSON.stringify(s.choices)));
+  const toast = useToast();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -42,6 +46,14 @@ export function Layout() {
             <Sigil />
             Origin Planner
           </Link>
+          <button
+            className={`btn btn-sm save-btn ${isSaved ? 'is-saved' : ''}`}
+            onClick={() => toast.show(`Saved “${save()}”`)}
+            title={isSaved ? 'All changes saved — click to save again' : 'Save this build in your browser'}
+            data-testid="save"
+          >
+            <Save width={15} /> {isSaved ? 'Saved' : 'Save'}
+          </button>
           <nav className="nav" aria-label="Main">
             {NAV.map((n) => (
               <NavLink key={n.to} to={n.to}>
@@ -57,10 +69,11 @@ export function Layout() {
             aria-label={`Theme: ${theme}. Click to change.`}
           >
             {theme === 'light' ? <Sun width={16} /> : <Moon width={16} />}
-            <span className="faint">{theme}</span>
+            <span className="faint theme-label">{theme}</span>
           </button>
         </div>
       </header>
+      {toast.node}
       <main className="main">
         <Outlet />
       </main>

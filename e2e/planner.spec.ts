@@ -143,3 +143,33 @@ test('story path: revisiting an early choice keeps later answers', async ({ page
   await expect(page.getByTestId('scene')).toHaveAttribute('data-scene', 'omen');
   await expect(page.locator('.story-panel')).toContainText('Amn');
 });
+
+test('top-left save button stores the build and reflects saved state', async ({ page }) => {
+  await answerAll(page, WARLOCK_ANSWERS);
+  await page.getByLabel('Character name').fill('Vex');
+  const save = page.getByTestId('save');
+  await expect(save).toHaveText(/^\s*Save$/);
+  await save.click();
+  await expect(page.getByRole('status')).toContainText('Saved “Vex”');
+  await expect(save).toHaveText(/Saved/);
+  await page.getByLabel('Character name').fill('Vex the Bold');
+  await expect(save).toHaveText(/^\s*Save$/);
+  await page.goto('/#/builds');
+  await expect(page.getByText('Vex', { exact: true })).toBeVisible();
+});
+
+test('cheat sheet downloads as a printable page', async ({ page }) => {
+  await answerAll(page, WARLOCK_ANSWERS);
+  await page.getByLabel('Character name').fill('Vex');
+  await page.goto('/#/builds');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('cheatsheet-download').click()]);
+  expect(download.suggestedFilename()).toBe('vex-cheat-sheet.html');
+  const path = test.info().outputPath(download.suggestedFilename());
+  await download.saveAs(path);
+  const sheet = await page.context().newPage();
+  await sheet.goto(`file://${path}`);
+  await expect(sheet.getByRole('heading', { name: 'Vex', level: 1 })).toBeVisible();
+  await expect(sheet.getByRole('heading', { name: 'Level-up plan' })).toBeVisible();
+  await expect(sheet.locator('td.lv')).toHaveCount(12);
+  await expect(sheet.locator('body')).not.toContainText('Markoheshkir');
+});

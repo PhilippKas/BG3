@@ -346,6 +346,11 @@ export function deriveBuild(choices: Choices): Build {
   let scores = { ...start };
   const known: Spell[] = [];
   const always = new Set<string>();
+  // Spells granted for free at any level (race, subclass) are never worth learning separately.
+  const grantedEver = new Set<string>([
+    ...[...(race.innateSpells ?? []), ...(subrace?.innateSpells ?? [])].map((s) => s.spell),
+    ...(sub.bonusSpells ?? []).flatMap((b) => b.spells).filter((id) => !isWarlockPatronSpell(id)),
+  ]);
   const taken: string[] = [];
   const takenChoices = new Set<string>();
   let fightingStyles: string[] = [];
@@ -464,6 +469,7 @@ export function deriveBuild(choices: Choices): Build {
           !excluded.has(s.id) &&
           !known.some((k) => k.id === s.id) &&
           !always.has(s.id) &&
+          !grantedEver.has(s.id) &&
           (anyClass || (spellList && s.classes.includes(spellList)) || isWarlockPatronSpell(s.id)),
       );
     const thirdSchools = sub.id === 'eldritch-knight' ? ['Abjuration', 'Evocation'] : sub.id === 'arcane-trickster' ? ['Enchantment', 'Illusion'] : null;

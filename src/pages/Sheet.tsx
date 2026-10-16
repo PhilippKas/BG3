@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { weaponById } from '../data';
 import { PeopleEditor } from '../components/StoryPath';
 import { originProgress } from '../components/progress';
+import { downloadCheatSheet } from '../components/exports';
 import { ABILITIES, SKILL_NAMES, SKILLS, type Ability, type Skill } from '../data/schema';
 import { TAG_LABELS } from '../data/tags';
 import {
@@ -61,6 +62,9 @@ export function Sheet() {
             {subrace?.name ?? race.name} {cls.name} · {sub.name} · {background.name}
           </div>
         </div>
+        <button className="btn btn-sm" onClick={() => downloadCheatSheet(build)} title="Download a printable reference sheet">
+          Cheat sheet
+        </button>
         <div className="traits">
           {dominantTags(build.profile, 4).map((t) => (
             <span key={t} className="chip">

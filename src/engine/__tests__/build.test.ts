@@ -109,3 +109,17 @@ describe('backstory', () => {
     expect(b.backstory).not.toContain('undefined');
   });
 });
+
+describe('granted spells', () => {
+  it('never learns a spell that race or subclass grants later', () => {
+    const c = emptyChoices();
+    c.classId = 'warlock';
+    c.raceId = 'tiefling';
+    c.subraceId = 'asmodeus-tiefling';
+    const b = deriveBuild(c);
+    const learned = b.levels.flatMap((l) => l.picks.filter((p) => ['spells', 'cantrips'].includes(p.kind)).flatMap((p) => p.chosen));
+    expect(learned).not.toContain('hellish-rebuke');
+    expect(learned).not.toContain('thaumaturgy');
+    expect(learned).not.toContain('darkness');
+  });
+});

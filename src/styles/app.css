@@ -1058,6 +1058,12 @@ label.field {
   .topbar-inner {
     gap: 6px 12px;
   }
+  .theme-label {
+    display: none;
+  }
+  .name-input {
+    font-size: 1.2rem;
+  }
   .nav {
     order: 3;
     flex-basis: 100%;
@@ -1256,4 +1262,14 @@ label.field {
     position: static;
     max-height: none;
   }
+}
+
+.save-btn {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.save-btn.is-saved {
+  border-color: var(--line);
+  color: var(--ink-faint);
 }

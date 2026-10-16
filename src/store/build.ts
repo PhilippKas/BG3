@@ -28,7 +28,8 @@ interface State {
   toggleSpell: (list: 'favouriteSpells' | 'excludedSpells', id: string) => void;
   replace: (choices: Choices) => void;
   reset: () => void;
-  save: () => void;
+  /** Saves the current build (replacing one with the same name) and returns its name. */
+  save: () => string;
   load: (id: string) => void;
   remove: (id: string) => void;
   setSpoilerLevel: (level: SpoilerLevel) => void;
@@ -97,6 +98,7 @@ export const useStore = create<State>()(
         const existing = saved.find((b) => b.name === name);
         const entry: SavedBuild = { id: existing?.id ?? newId(), name, savedAt: new Date().toISOString(), choices };
         set({ saved: [entry, ...saved.filter((b) => b.id !== entry.id)] });
+        return name;
       },
       load: (id) => {
         const b = get().saved.find((x) => x.id === id);

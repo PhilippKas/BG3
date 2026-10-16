@@ -59,3 +59,10 @@ export const Dice = (p: SVGProps<SVGSVGElement>) => (
     <circle cx="16.5" cy="13.5" r="0.8" fill="currentColor" />
   </svg>
 );
+
+export const Save = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <path d="M5 3h11l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+    <path d="M8 3v5h7V3M8 21v-7h8v7" />
+  </svg>
+);

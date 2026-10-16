@@ -11,7 +11,9 @@ A spoiler-free character planner for **Baldur’s Gate 3**. You play through you
 - **Spellbook:** your class list with filters. Mark spells as favourites (picked first) or excluded (never suggested).
 - **Gear plan, spoiler-free:** ordinary baseline equipment for each slot. Notable items are described only by what they do. Item names and locations stay hidden until you click *reveal*.
 - **Backstory:** written chapter by chapter from your story-path choices (or a short paragraph in quick-quiz mode).
-- **Builds:** save several builds in the browser, export or import JSON, share a link, or print.
+- **Save:** the **Save** button at the top left stores the current build in your browser and shows *Saved* while nothing has changed. The **Builds** page lists everything you have saved.
+- **Cheat sheet:** export a printable one-page reference (HTML, or *Print / save as PDF*). It covers what to pick in the in-game character creator, stats at levels 1 and 12, the level-up plan, spells, gear goals and your backstory. Item names and locations appear only if you revealed them on the Gear page.
+- **Builds:** export or import JSON, or share a link.
 
 ## Run it
 

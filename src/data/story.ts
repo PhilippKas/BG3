@@ -427,7 +427,7 @@ export const STORY: StoryChapter[] = [
         text: 'What became of them?',
         fate: true,
         options: [
-          opt('waiting', 'They are waiting for me to come home.', 'That person is still waiting for {name} to come home, and the thought has carried {name} through more than one bad night.', { protector: 2, light: 1 }),
+          opt('waiting', 'They are waiting for me to come home.', 'That person is still waiting for {name} to come home, and the thought has carried them through more than one bad night.', { protector: 2, light: 1 }),
           opt('parted', 'We parted in anger, and I never apologised.', 'The two parted in anger, and the apology was never made. It still sits in {name}’s throat.', { vengeance: 1, outcast: 1 }),
           opt('lost', 'They died, and I could not save them.', 'That person died, and nothing {name} did could prevent it.', { death: 2, healer: 1 }),
           opt('danger', 'They are in danger, and I am on my way.', 'Somewhere, that person is in danger, and {name} is on the way.', { protector: 2, vengeance: 1 }),

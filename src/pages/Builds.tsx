@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/Toast';
 import { originProgress } from '../components/progress';
+import { downloadCheatSheet, downloadFile, printCheatSheet } from '../components/exports';
 import { deriveBuild } from '../engine/build';
 import { encodeShare, exportBuild, parseChoices } from '../engine/share';
 import { useBuild, useStore } from '../store/build';
@@ -16,14 +17,8 @@ export function Builds() {
 
   const shareUrl = () => `${location.origin}${location.pathname}#/share/${encodeShare(build.choices)}`;
 
-  const download = () => {
-    const blob = new Blob([exportBuild(build.choices)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'build'}.bg3build.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
+  const download = () =>
+    downloadFile(`${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'build'}.bg3build.json`, exportBuild(build.choices), 'application/json');
 
   const importFile = async (f: File) => {
     try {
@@ -53,13 +48,7 @@ export function Builds() {
           {originProgress(build)}
         </p>
         <div className="row">
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              save();
-              toast.show('Build saved');
-            }}
-          >
+          <button className="btn btn-primary" onClick={() => toast.show(`Saved “${save()}”`)}>
             Save
           </button>
           <button
@@ -79,9 +68,7 @@ export function Builds() {
           <button className="btn" onClick={() => file.current?.click()}>
             Import file
           </button>
-          <button className="btn" onClick={() => window.print()}>
-            Print
-          </button>
+
           <input
             ref={file}
             type="file"
@@ -99,6 +86,22 @@ export function Builds() {
             }}
           >
             New character
+          </button>
+        </div>
+      </div>
+      <div className="card">
+        <h2>Cheat sheet</h2>
+        <p className="muted small">
+          A one-page reference to keep next to the game: what to pick in the character creator, stats, the level-by-level
+          plan, spells, gear goals and your backstory. Gear names and locations appear only if you revealed them on the
+          Gear page.
+        </p>
+        <div className="row">
+          <button className="btn btn-primary" onClick={() => downloadCheatSheet(build)} data-testid="cheatsheet-download">
+            Download cheat sheet (.html)
+          </button>
+          <button className="btn" onClick={() => printCheatSheet(build) || toast.show('Allow pop-ups to print the cheat sheet')}>
+            Print / save as PDF
           </button>
         </div>
       </div>
