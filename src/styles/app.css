@@ -1107,3 +1107,153 @@ label.field {
     break-inside: avoid;
   }
 }
+
+/* ---------- Story path ---------- */
+
+.story-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.chapter-intro {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+}
+
+.chapter-intro h2 {
+  color: var(--gold);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-intro p,
+.lore,
+.story-line {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.chapter-intro p {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.7;
+}
+
+.lore {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--gold);
+  background: var(--bg-sunk);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.option:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.dice-btn {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dice-btn svg {
+  transition: transform 0.2s;
+}
+
+.dice-btn:hover svg {
+  transform: rotate(20deg);
+}
+
+.dice-btn.rolling svg {
+  animation: dice-roll 0.35s linear infinite;
+}
+
+@keyframes dice-roll {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dice-btn.rolling svg {
+    animation: none;
+  }
+}
+
+.story-panel {
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+}
+
+.story-chapter {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 12px 0 4px;
+}
+
+.story-line {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.story-line:hover {
+  background: var(--bg-sunk);
+}
+
+.story-line.current {
+  background: var(--gold-soft);
+}
+
+.people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.people > .faint {
+  grid-column: 1 / -1;
+}
+
+.backstory-chapter + .backstory-chapter {
+  margin-top: 18px;
+}
+
+.backstory-chapter h3 {
+  color: var(--gold);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 900px) {
+  .story-layout {
+    grid-template-columns: 1fr;
+  }
+  .story-panel {
+    position: static;
+    max-height: none;
+  }
+}

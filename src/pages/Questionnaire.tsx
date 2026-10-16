@@ -3,9 +3,30 @@ import { Link, useNavigate } from 'react-router-dom';
 import { QUESTIONS } from '../data';
 import { TAG_LABELS } from '../data/tags';
 import { dominantTags } from '../engine/tags';
+import { StoryPath } from '../components/StoryPath';
 import { useBuild, useStore } from '../store/build';
 
 export function Questionnaire() {
+  const mode = useBuild().mode;
+  const setMode = useStore((s) => s.setMode);
+  return (
+    <div className="stack">
+      <div className="row" style={{ justifyContent: 'center' }}>
+        <div className="segmented" role="group" aria-label="Origin mode">
+          <button aria-pressed={mode === 'story'} onClick={() => setMode('story')}>
+            Story path
+          </button>
+          <button aria-pressed={mode === 'quick'} onClick={() => setMode('quick')}>
+            Quick quiz
+          </button>
+        </div>
+      </div>
+      {mode === 'story' ? <StoryPath /> : <QuickQuiz />}
+    </div>
+  );
+}
+
+function QuickQuiz() {
   const answers = useStore((s) => s.choices.answers);
   const answer = useStore((s) => s.answer);
   const build = useBuild();

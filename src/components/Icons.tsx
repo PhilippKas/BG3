@@ -49,3 +49,13 @@ export const Moon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
   </svg>
 );
+
+export const Dice = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <path d="M12 2l8.7 5v10L12 22l-8.7-5V7z" />
+    <path d="M12 22V12M12 12l8.7-5M12 12L3.3 7" />
+    <circle cx="12" cy="7" r="0.8" fill="currentColor" />
+    <circle cx="7.5" cy="13.5" r="0.8" fill="currentColor" />
+    <circle cx="16.5" cy="13.5" r="0.8" fill="currentColor" />
+  </svg>
+);

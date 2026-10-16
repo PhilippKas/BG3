@@ -4,6 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 /** Answers every question by clicking the option whose text matches. */
 async function answerAll(page: Page, picks: string[]) {
   await page.goto('/#/origin');
+  await page.getByRole('button', { name: 'Quick quiz' }).click();
   for (const text of picks) {
     await page.getByRole('button', { name: text, exact: false }).first().click();
   }
@@ -85,4 +86,60 @@ test('share link round-trips a build', async ({ page, context }) => {
   await expect(fresh.getByRole('heading', { name: 'Shared Sam' })).toBeVisible();
   await fresh.getByRole('button', { name: 'Open this build' }).click();
   await expect(fresh.getByTestId('summary')).toContainText('Warlock');
+});
+
+test('story path: play through with a fate roll, rename a person, see chapters', async ({ page }) => {
+  await page.goto('/#/origin');
+  await expect(page.getByRole('button', { name: 'Story path' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Prologue: The Realms, 1492 DR').first()).toBeVisible();
+
+  // Homeland shows lore once picked, then the next scene appears.
+  await page.getByRole('button', { name: /^Waterdeep/ }).click();
+  await expect(page.getByTestId('scene')).toHaveAttribute('data-scene', 'family');
+  await expect(page.getByTestId('lore')).toContainText('Masked Lords');
+
+  let rolled = false;
+  for (let i = 0; i < 30; i++) {
+    if (await page.getByTestId('story-end').isVisible()) break;
+    const scene = page.getByTestId('scene');
+    const id = await scene.getAttribute('data-scene');
+    if (id === 'source') {
+      await scene.getByRole('button', { name: /reclusive mage/ }).click();
+    } else if (!rolled && (await page.getByTestId('roll').isVisible())) {
+      await page.getByTestId('roll').click();
+      rolled = true;
+      await expect(page.getByTestId('scene')).not.toHaveAttribute('data-scene', id!);
+    } else {
+      await scene.locator('.option').first().click();
+    }
+    await expect(page.getByTestId('scene').or(page.getByTestId('story-end'))).toBeVisible();
+  }
+  expect(rolled).toBe(true);
+  await expect(page.getByTestId('story-end')).toBeVisible();
+
+  // Reload keeps the finished story.
+  await page.reload();
+  await expect(page.getByTestId('story-end')).toBeVisible();
+
+  await page.getByLabel('Mentor name').fill('Magister Quell');
+  await page.getByRole('link', { name: 'See your character →' }).click();
+  await expect(page.getByTestId('summary')).toBeVisible();
+  const backstory = page.getByTestId('backstory');
+  for (const title of ['The Realms, 1492 DR', 'The Awakening', 'The Eve']) await expect(backstory.getByRole('heading', { name: title })).toBeVisible();
+  await expect(backstory).toContainText('Magister Quell');
+  await expect(backstory).toContainText('Waterdeep');
+  await page.goto('/#/origin');
+  await expect(page.getByTestId('story-end')).toBeVisible();
+});
+
+test('story path: revisiting an early choice keeps later answers', async ({ page }) => {
+  await page.goto('/#/origin');
+  await page.getByRole('button', { name: /^Neverwinter/ }).click();
+  await page.locator('.option').first().click();
+  await expect(page.getByTestId('scene')).toHaveAttribute('data-scene', 'omen');
+  await page.getByRole('button', { name: /Neverwinter/ }).first().click(); // story panel line
+  await expect(page.getByTestId('scene')).toHaveAttribute('data-scene', 'homeland');
+  await page.getByRole('button', { name: /^Amn/ }).click();
+  await expect(page.getByTestId('scene')).toHaveAttribute('data-scene', 'omen');
+  await expect(page.locator('.story-panel')).toContainText('Amn');
 });

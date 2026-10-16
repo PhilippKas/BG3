@@ -7,7 +7,11 @@ const ScoresSchema = z.object(Object.fromEntries(ABILITIES.map((a) => [a, z.numb
 
 export const ChoicesSchema = z.strictObject({
   name: z.string().max(80).default(''),
+  mode: z.enum(['story', 'quick']).optional(),
   answers: z.record(z.string(), z.string()).default({}),
+  story: z.record(z.string(), z.string()).default({}),
+  storyRolled: z.array(z.string()).default([]),
+  storyNames: z.record(z.string(), z.string().max(60)).default({}),
   classId: z.string().optional(),
   subclassId: z.string().optional(),
   raceId: z.string().optional(),

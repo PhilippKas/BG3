@@ -71,7 +71,19 @@ import {
   type Ranked,
   type WeaponStyle,
 } from './recommend';
-import { buildProfile, type Profile } from './tags';
+import { buildProfile, profileFromTags, type Profile } from './tags';
+import {
+  backstoryText,
+  fillText,
+  peopleInStory,
+  resolveNames,
+  storyBackstory,
+  storyTags,
+  walkStory,
+  type BackstoryChapter,
+  type StoryPersonName,
+  type StoryWalk,
+} from './story';
 import { composeBackstory } from './backstory';
 
 export type PickKind =
@@ -85,9 +97,20 @@ export type PickKind =
   | 'pact-boon'
   | 'invocations';
 
+export type OriginMode = 'story' | 'quick';
+
 export interface Choices {
   name: string;
+  /** Which questionnaire drives the build; inferred when missing (older builds). */
+  mode?: OriginMode;
+  /** Quick quiz answers: question id → option id. */
   answers: Record<string, string>;
+  /** Story path answers: scene id → option id. */
+  story: Record<string, string>;
+  /** Scenes whose answer was decided by a fate roll. */
+  storyRolled: string[];
+  /** Custom names for people in the story, by person key. */
+  storyNames: Record<string, string>;
   classId?: string;
   subclassId?: string;
   raceId?: string;
@@ -104,7 +127,20 @@ export interface Choices {
   excludedSpells: string[];
 }
 
-export const emptyChoices = (): Choices => ({ name: '', answers: {}, picks: {}, favouriteSpells: [], excludedSpells: [] });
+export const emptyChoices = (): Choices => ({
+  name: '',
+  answers: {},
+  story: {},
+  storyRolled: [],
+  storyNames: {},
+  picks: {},
+  favouriteSpells: [],
+  excludedSpells: [],
+});
+
+/** Older builds only have quiz answers; treat those as quick mode. */
+export const modeOf = (c: Choices): OriginMode =>
+  c.mode ?? (Object.keys(c.answers ?? {}).length && !Object.keys(c.story ?? {}).length ? 'quick' : 'story');
 
 export interface PickOption {
   id: string;
@@ -153,8 +189,17 @@ export interface LevelPlan {
 export interface Build {
   choices: Choices;
   profile: Profile;
+  mode: OriginMode;
+  /** Questions or scenes answered in the current mode. */
   answered: number;
   complete: boolean;
+  story: {
+    walk: StoryWalk;
+    chapters: BackstoryChapter[];
+    people: StoryPersonName[];
+    /** Fill story placeholders (names, homeland) for display. */
+    fill: (text: string) => string;
+  };
   cls: ClassDef;
   sub: Subclass;
   race: Race;
@@ -215,8 +260,11 @@ const spellMeta = (s: Spell) =>
   `${s.level === 0 ? 'Cantrip' : `Level ${s.level}`} · ${s.school}${s.concentration ? ' · Concentration' : ''}${s.damage ? ` · ${s.damage}` : ''}`;
 
 export function deriveBuild(choices: Choices): Build {
-  const profile = buildProfile(choices.answers);
-  const answered = QUESTIONS.filter((q) => choices.answers[q.id]).length;
+  const mode = modeOf(choices);
+  const walk = walkStory({ story: choices.story ?? {}, rolled: choices.storyRolled ?? [] });
+  const profile = mode === 'story' ? profileFromTags(storyTags(walk)) : buildProfile(choices.answers);
+  const answered = mode === 'story' ? walk.steps.filter((s) => s.chosen).length : QUESTIONS.filter((q) => choices.answers[q.id]).length;
+  const complete = mode === 'story' ? walk.complete : answered === QUESTIONS.length;
 
   // Class & subclass
   const classes = rankClasses(profile);
@@ -498,8 +546,10 @@ export function deriveBuild(choices: Choices): Build {
   const build: Build = {
     choices,
     profile,
+    mode,
     answered,
-    complete: answered === QUESTIONS.length,
+    complete,
+    story: { walk, chapters: [], people: [], fill: (t) => t },
     cls,
     sub,
     race,
@@ -530,7 +580,13 @@ export function deriveBuild(choices: Choices): Build {
     backstory: '',
     gear,
   };
-  build.backstory = composeBackstory(build);
+  const names = resolveNames(choices.story ?? {}, choices.storyNames ?? {});
+  const ctx = { hero: choices.name, names, defines: walk.defines };
+  build.story.chapters = storyBackstory(walk, ctx);
+  build.story.people = peopleInStory(walk, names);
+  build.story.fill = (text) => fillText(text, ctx);
+  build.backstory =
+    mode === 'story' && build.story.chapters.length ? backstoryText(build.story.chapters) : composeBackstory(build);
   return build;
 }
 

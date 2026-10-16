@@ -16,6 +16,12 @@ export function buildProfile(answers: Record<string, string>): Profile {
   return p;
 }
 
+export function profileFromTags(tags: Tags): Profile {
+  const p = emptyProfile();
+  for (const [tag, w] of Object.entries(tags) as [Tag, number][]) p[tag] += w;
+  return p;
+}
+
 const norm = (v: Iterable<number>) => Math.sqrt([...v].reduce((s, x) => s + x * x, 0));
 
 export function dot(tags: Tags, profile: Profile): number {

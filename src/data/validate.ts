@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { BACKGROUNDS, CLASSES, FEATS, ITEMS, QUESTIONS, RACES, SPELLS, SUBCLASSES, weaponById } from './index';
-import { Background, ClassDef, Feat, Item, Question, Race, Spell, Subclass } from './schema';
+import { Background, ClassDef, Feat, Item, Question, Race, Spell, StoryChapter, StoryPerson, Subclass } from './schema';
+import { STORY, STORY_PEOPLE } from './story';
 
 /** Words that would give away story content; item descriptions must avoid them. */
-const SPOILER_WORDS = /\b(astarion|shadowheart|gale|lae'?zel|wyll|karlach|minthara|halsin|jaheira|minsc|withers|orin|gortash|ketheric|raphael|nautiloid|illithid|tadpole|absolute|netherbrain|emperor|dark urge)\b/i;
+const SPOILER_WORDS = /\b(astarion|shadowheart|gale|lae'?zel|wyll|karlach|minthara|halsin|jaheira|minsc|withers|orin|gortash|ketheric|raphael|nautiloid|illithid|mind ?flayers?|tadpoles?|absolute|netherbrain|emperor|dark urge)\b/i;
 
 /** Returns a list of human-readable problems (empty when the data is valid). */
 export function validateAll(): string[] {
@@ -22,6 +23,8 @@ export function validateAll(): string[] {
   check('spell', Spell, SPELLS);
   check('item', Item, ITEMS);
   check('question', Question, QUESTIONS);
+  check('story chapter', StoryChapter, STORY);
+  check('story person', StoryPerson, STORY_PEOPLE);
 
   const unique = (label: string, ids: string[]) => {
     const seen = new Set<string>();
@@ -61,6 +64,18 @@ export function validateAll(): string[] {
   }
   for (const q of QUESTIONS) {
     for (const o of q.options) if (SPOILER_WORDS.test(o.text) || SPOILER_WORDS.test(o.fragment)) problems.push(`question ${q.id}/${o.id}: spoiler word`);
+  }
+  const sceneIds = STORY.flatMap((c) => c.scenes.map((s) => s.id));
+  unique('story scene', sceneIds);
+  for (const c of STORY) {
+    if (SPOILER_WORDS.test(c.intro)) problems.push(`story ${c.id}: spoiler word in intro`);
+    for (const s of c.scenes) {
+      unique(`option in scene ${s.id}`, s.options.map((o) => o.id));
+      for (const text of [s.text, ...s.options.flatMap((o) => [o.text, o.narration, o.lore ?? ''])]) {
+        if (SPOILER_WORDS.test(text)) problems.push(`story ${s.id}: spoiler word in "${text.slice(0, 40)}…"`);
+      }
+      if (s.options.some((o) => o.fateOnly) && !s.fate) problems.push(`story ${s.id}: fate-only option in a scene without a fate roll`);
+    }
   }
   return problems;
 }
