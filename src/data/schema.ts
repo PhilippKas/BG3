@@ -289,3 +289,60 @@ export const Question = z.object({
   options: z.array(AnswerOption).min(2),
 });
 export type Question = z.infer<typeof Question>;
+
+// ----- Story path ----------------------------------------------------------
+
+/** Condition on story flags set by earlier choices. */
+export const Cond = z.object({
+  all: z.array(z.string()).optional(),
+  any: z.array(z.string()).optional(),
+  none: z.array(z.string()).optional(),
+});
+export type Cond = z.infer<typeof Cond>;
+
+export const StoryOption = z.object({
+  id: z.string(),
+  /** What the player picks (first person). */
+  text: z.string(),
+  /** Backstory paragraph (third person, “they”), may use {placeholders}. */
+  narration: z.string(),
+  /** Optional world lore shown after picking (e.g. about a homeland). */
+  lore: z.string().optional(),
+  tags: Tags,
+  sets: z.array(z.string()).optional(),
+  /** Placeholder values defined by this choice, e.g. { home: 'Waterdeep' }. */
+  defines: z.record(z.string(), z.string()).optional(),
+  requires: Cond.optional(),
+  /** Twist only reachable by letting fate decide. */
+  fateOnly: z.boolean().optional(),
+  weight: z.number().positive().optional(),
+});
+export type StoryOption = z.infer<typeof StoryOption>;
+
+export const StoryScene = z.object({
+  id: z.string(),
+  /** The situation, addressed to the player (“you”). */
+  text: z.string(),
+  requires: Cond.optional(),
+  /** Offers a “Let fate decide” roll. */
+  fate: z.boolean().optional(),
+  /** Multiplier for the trait tags of this scene's choice (defining moments count more). */
+  weight: z.number().positive().optional(),
+  options: z.array(StoryOption).min(2),
+});
+export type StoryScene = z.infer<typeof StoryScene>;
+
+export const StoryChapter = z.object({
+  id: z.string(),
+  title: z.string(),
+  intro: z.string(),
+  scenes: z.array(StoryScene).min(1),
+});
+export type StoryChapter = z.infer<typeof StoryChapter>;
+
+export const StoryPerson = z.object({
+  key: z.string(),
+  role: z.string(),
+  names: z.array(z.string()).min(1),
+});
+export type StoryPerson = z.infer<typeof StoryPerson>;

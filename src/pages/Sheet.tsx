@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { QUESTIONS, weaponById } from '../data';
+import { weaponById } from '../data';
+import { PeopleEditor } from '../components/StoryPath';
+import { originProgress } from '../components/progress';
 import { ABILITIES, SKILL_NAMES, SKILLS, type Ability, type Skill } from '../data/schema';
 import { TAG_LABELS } from '../data/tags';
 import {
@@ -36,8 +38,7 @@ export function Sheet() {
             </>
           ) : (
             <>
-              {build.answered} of {QUESTIONS.length} questions answered. <Link to="/origin">Finish your origin</Link> for a
-              better fit.
+              {originProgress(build)}. <Link to="/origin">Finish your origin</Link> for a better fit.
             </>
           )}
         </div>
@@ -132,11 +133,29 @@ export function Sheet() {
             Copy
           </button>
         </div>
-        <div className="backstory" data-testid="backstory">
-          {build.backstory}
-        </div>
+        {build.mode === 'story' && build.story.chapters.length > 0 ? (
+          <>
+            <div className="backstory" data-testid="backstory">
+              {build.story.chapters.map((c) => (
+                <section key={c.title} className="backstory-chapter">
+                  <h3>{c.title}</h3>
+                  {c.paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </section>
+              ))}
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <PeopleEditor />
+            </div>
+          </>
+        ) : (
+          <div className="backstory" data-testid="backstory">
+            {build.backstory}
+          </div>
+        )}
         <p className="faint" style={{ marginTop: 12 }}>
-          Generated from your answers. Use it as a starting point for your own words.
+          Generated from your {build.mode === 'story' ? 'story path' : 'answers'}. Use it as a starting point for your own words.
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { deriveBuild, emptyChoices, type Choices } from '../engine/build';
+import { deriveBuild, emptyChoices, modeOf, type Choices, type OriginMode } from '../engine/build';
 
 export type SpoilerLevel = 0 | 1 | 2;
 export type Theme = 'system' | 'light' | 'dark';
@@ -21,6 +21,9 @@ interface State {
   theme: Theme;
   update: (patch: Partial<Choices>) => void;
   answer: (questionId: string, optionId: string) => void;
+  answerScene: (sceneId: string, optionId: string, rolled?: boolean) => void;
+  setMode: (mode: OriginMode) => void;
+  setPersonName: (key: string, name: string) => void;
   setPick: (key: string, chosen: string[]) => void;
   toggleSpell: (list: 'favouriteSpells' | 'excludedSpells', id: string) => void;
   replace: (choices: Choices) => void;
@@ -45,7 +48,27 @@ export const useStore = create<State>()(
       theme: 'system',
       update: (patch) => set((s) => ({ choices: { ...s.choices, ...patch } })),
       answer: (questionId, optionId) =>
-        set((s) => ({ choices: { ...s.choices, answers: { ...s.choices.answers, [questionId]: optionId } } })),
+        set((s) => ({ choices: { ...s.choices, mode: 'quick', answers: { ...s.choices.answers, [questionId]: optionId } } })),
+      answerScene: (sceneId, optionId, rolled = false) =>
+        set((s) => {
+          const others = (s.choices.storyRolled ?? []).filter((id) => id !== sceneId);
+          return {
+            choices: {
+              ...s.choices,
+              mode: 'story',
+              story: { ...s.choices.story, [sceneId]: optionId },
+              storyRolled: rolled ? [...others, sceneId] : others,
+            },
+          };
+        }),
+      setMode: (mode) => set((s) => ({ choices: { ...s.choices, mode } })),
+      setPersonName: (key, name) =>
+        set((s) => {
+          const storyNames = { ...s.choices.storyNames };
+          if (name.trim()) storyNames[key] = name.slice(0, 60);
+          else delete storyNames[key];
+          return { choices: { ...s.choices, storyNames } };
+        }),
       setPick: (key, chosen) =>
         set((s) => {
           const picks = { ...s.choices.picks };
@@ -90,7 +113,8 @@ export const useStore = create<State>()(
       version: 1,
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<State>;
-        return { ...current, ...p, choices: { ...emptyChoices(), ...(p.choices ?? {}) } };
+        const choices = { ...emptyChoices(), ...(p.choices ?? {}) };
+        return { ...current, ...p, choices: { ...choices, mode: modeOf(choices) } };
       },
     },
   ),

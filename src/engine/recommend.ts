@@ -118,6 +118,8 @@ function raceSynergy(race: Race, subrace: Subrace | undefined, classArmour: Armo
   else if (!classArmour.includes('light') && armour.includes('light')) s += 0.05;
   if (race.id === 'half-orc' && primary === 'STR') s += 0.06;
   if (race.id === 'halfling') s += 0.02;
+  // Human Versatility (an extra skill) suits almost any concept.
+  if (race.id === 'human') s += 0.04;
   if (race.darkvision > 0 || (subrace?.darkvision ?? 0) > 0) s += 0.02;
   if (subrace?.id === 'wood-elf' || subrace?.id === 'wood-half-elf') s += style.has('melee') ? 0.03 : 0.01;
   if (race.id === 'githyanki') s += 0.02;

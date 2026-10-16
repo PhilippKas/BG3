@@ -1,16 +1,21 @@
 # BG3 Origin Planner
 
-A spoiler-free character planner for **Baldur’s Gate 3**. You describe who your character was before the adventure by answering 15 roleplay questions. The planner turns those answers into a full build:
+A spoiler-free character planner for **Baldur’s Gate 3**. You play through your character’s life before the adventure, and the planner turns your choices into a backstory and a full build:
+
+- **Story path:** a branching walk through the character’s past. A prologue of Forgotten Realms lore sets the scene: your homeland, family and the omens at your birth. Six chapters follow: *Small Hands*, *The Awakening*, *The Bond*, *The Wound*, *The Road* and *The Eve*. Earlier choices open or close later scenes. Some scenes let you **roll for fate**, which can produce twists you can’t pick by hand. Named people from your past (a mentor, a sibling, a rival and so on) appear along the way, and you can rename them.
+- **Quick quiz:** the original 15 personality questions, if you just want a fast build.
 
 - **Origin:** race and subrace, class and subclass, and background, each ranked by how well it fits your story, with a short reason for every pick.
 - **Ability scores:** 27-point buy plus the +2/+1 bonuses, allocated for your class and weapon style. You can edit them with steppers.
 - **Levels 1–12:** class features, feats and ability improvements, fighting styles, metamagic, pact boons, invocations, cantrips and spells for every level. Every pick can be changed, and later levels adapt to your changes.
 - **Spellbook:** your class list with filters. Mark spells as favourites (picked first) or excluded (never suggested).
 - **Gear plan, spoiler-free:** ordinary baseline equipment for each slot. Notable items are described only by what they do. Item names and locations stay hidden until you click *reveal*.
-- **Backstory:** a short narrative composed from your answers.
+- **Backstory:** written chapter by chapter from your story-path choices (or a short paragraph in quick-quiz mode).
 - **Builds:** save several builds in the browser, export or import JSON, share a link, or print.
 
 ## Run it
+
+Requires **Node.js 20.19+ or 22.12+** (the current LTS is recommended). Older Node versions make `npm install` skip Vite’s native bundler binary, and `npm run dev` then fails with *“Cannot find native binding”*.
 
 ```bash
 npm install
@@ -32,7 +37,7 @@ npm run dev          # http://localhost:5173
 
 ## How the recommendations work
 
-1. Every answer adds weights to trait tags such as `pact`, `shadow`, `protector` or `elemental` (`src/data/questionnaire.ts`).
+1. Every story choice (`src/data/story.ts`) or quiz answer (`src/data/questionnaire.ts`) adds weights to trait tags such as `pact`, `shadow`, `protector` or `elemental`. Defining story moments, such as your homeland and how your power awakened, count more than later ones (`src/engine/story.ts`).
 2. Every race, class, subclass, background, feat, spell and item also carries trait tags. Candidates are ranked by cosine similarity to your trait profile, plus mechanical synergy: for example, medium armour for casters, Half-Orc for Strength builds, or feats that match your weapon style (`src/engine/recommend.ts`).
 3. `src/engine/build.ts` walks levels 1–12. It applies feats and ability improvements, learns spells within the available spell slots, and respects every override you make.
 

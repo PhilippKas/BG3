@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/Toast';
+import { originProgress } from '../components/progress';
 import { deriveBuild } from '../engine/build';
 import { encodeShare, exportBuild, parseChoices } from '../engine/share';
 import { useBuild, useStore } from '../store/build';
@@ -49,7 +50,7 @@ export function Builds() {
         <h2>Current: {title}</h2>
         <p className="muted small">
           {build.subrace?.name ?? build.race.name} {build.cls.name} · {build.sub.name} · {build.background.name} ·{' '}
-          {build.answered}/15 questions answered
+          {originProgress(build)}
         </p>
         <div className="row">
           <button

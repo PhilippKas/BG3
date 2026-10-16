@@ -29,7 +29,7 @@ export function Share() {
       <p className="muted">
         {b.subrace?.name ?? b.race.name} {b.cls.name} · {b.sub.name} · {b.background.name}
       </p>
-      <p className="backstory small">{b.backstory.split('\n\n')[0]}</p>
+      <p className="backstory small">{b.story.chapters[0]?.paragraphs[0] ?? b.backstory.split('\n\n')[0]}</p>
       <p className="faint">Opening this build replaces your current one. Save your current build first if you want to keep it.</p>
       <div className="row">
         <button

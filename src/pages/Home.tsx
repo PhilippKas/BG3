@@ -3,18 +3,23 @@ import { QUESTIONS } from '../data';
 import { useBuild, useStore } from '../store/build';
 
 export function Home() {
-  const answered = useStore((s) => Object.keys(s.choices.answers).length);
   const build = useBuild();
+  const setMode = useStore((s) => s.setMode);
+  const answered = build.answered;
   return (
     <div className="landing">
       <h1>Who were you before the adventure began?</h1>
       <p className="lead">
-        Answer {QUESTIONS.length} questions about your character’s past. The planner turns your story into a fitting
-        Baldur’s Gate 3 build: race, class, ability scores, spells, feats and gear, all without spoilers.
+        Live through your character’s past, from a birthplace in the Forgotten Realms to the night everything
+        changed. Your choices write a backstory and shape a fitting Baldur’s Gate 3 build: race, class, ability scores,
+        spells, feats and gear, all without spoilers.
       </p>
       <div className="row" style={{ justifyContent: 'center' }}>
-        <Link to="/origin" className="btn btn-primary">
-          {answered ? 'Continue your origin' : 'Begin your origin'}
+        <Link to="/origin" className="btn btn-primary" onClick={() => setMode('story')}>
+          {answered && build.mode === 'story' ? 'Continue your story' : 'Begin your story'}
+        </Link>
+        <Link to="/origin" className="btn" onClick={() => setMode('quick')}>
+          Quick quiz ({QUESTIONS.length} questions)
         </Link>
         {answered > 0 && (
           <Link to="/character" className="btn">
@@ -25,7 +30,7 @@ export function Home() {
       <div className="steps">
         <div className="card">
           <b>1 · Tell your story</b>
-          <p className="small muted">Roleplay questions: where your power comes from, how you grew up, what you fear.</p>
+          <p className="small muted">A branching path through your past, with dice rolls if you want fate to decide.</p>
         </div>
         <div className="card">
           <b>2 · Get your build</b>

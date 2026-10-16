@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { QUESTIONS } from '../data';
-import { useStore, type Theme } from '../store/build';
+import { STORY } from '../data/story';
+import { useBuild, useStore, type Theme } from '../store/build';
 import { Moon, Sigil, Sun } from './Icons';
 
 const NAV = [
@@ -16,7 +17,7 @@ const NAV = [
 const NEXT_THEME: Record<Theme, Theme> = { system: 'dark', dark: 'light', light: 'system' };
 
 export function Layout() {
-  const answered = useStore((s) => Object.keys(s.choices.answers).length);
+  const build = useBuild();
   const theme = useStore((s) => s.theme);
   const setTheme = useStore((s) => s.setTheme);
   const { pathname } = useLocation();
@@ -28,7 +29,10 @@ export function Layout() {
 
   useEffect(() => window.scrollTo(0, 0), [pathname]);
 
-  const remaining = QUESTIONS.length - answered;
+  // Badge: questions left (quick quiz) or chapters left (story), once started.
+  const remaining =
+    build.mode === 'quick' ? QUESTIONS.length - build.answered : STORY.length - build.story.walk.chapterIndex;
+  const answered = build.complete ? 0 : build.answered;
 
   return (
     <div className="app">
