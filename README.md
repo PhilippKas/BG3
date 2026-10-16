@@ -12,6 +12,8 @@ A spoiler-free character planner for **Baldur’s Gate 3**. You describe who you
 
 ## Run it
 
+Requires **Node.js 20.19+ or 22.12+** (the current LTS is recommended). Older Node versions make `npm install` skip Vite’s native bundler binary, and `npm run dev` then fails with *“Cannot find native binding”*.
+
 ```bash
 npm install
 npm run dev          # http://localhost:5173
